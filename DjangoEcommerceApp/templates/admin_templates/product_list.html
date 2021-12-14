@@ -1,0 +1,124 @@
+{% extends 'admin_templates/base_template.html' %}
+{% block title %}
+Product List List
+{% endblock title %}
+{% block custom_css %}
+<style>
+  .product-description{
+    height: 4em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+  }
+  .product-description:hover{
+    height: 12em;
+    overflow-y: scroll;
+    text-overflow: initial;
+    -webkit-line-clamp: initial;
+    -webkit-box-orient: initial;
+  }
+  .product-description::-webkit-scrollbar-thumb {
+    background: #6777ef; 
+    border-radius: 5px;
+  }
+  .product-description::-webkit-scrollbar-track {
+    border-radius: 5px;
+  }
+  .product-description::-webkit-scrollbar {
+    width: 5px;
+  }
+</style>
+{% endblock custom_css %}
+{% block page_title %}
+Product List List
+{% endblock page_title %}
+{% block page_content %}
+<form method="GET" class="form-inline mr-auto">
+  <div class="col-12">
+    <div class="form-group" style="float: right;">
+      <label class="form-label">Sort by</label>
+      <div class="selectgroup w-100">
+        <label class="selectgroup-item">
+          <a href="{% url 'product_list_view' %}" style="text-decoration:none;">
+            <input type="radio" name="value" value="50" class="selectgroup-input" {% if orderby == "" %}checked{% endif %}>
+            <span class="selectgroup-button hover-shadow-5px">None</span>
+          </a>
+        </label>
+        {% for i in sorting_fields %}
+        <label class="selectgroup-item">
+          <a href="{% url 'product_list_view' %}?filter={{ filter }}&orderby={{ i }}" style="text-decoration:none;">
+            <input type="radio" name="value" value="150" class="selectgroup-input"  {% if orderby == i %}checked{% endif %}>
+            <span class="selectgroup-button hover-shadow-5px">{{i.capitalize}}</span>
+          </a>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="search-element">
+      <input class="form-control" type="search" placeholder="Search" aria-label="Search" data-width="250" style="width: 250px;" name="filter" value="{{filter}}">
+      <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>      
+    </div>
+  </div>
+</form>
+<br>
+
+<div class="row">
+    {% comment %} {% for i in products_list %} {% endcomment %}
+    {% for i in object_list %}
+    <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+        <article class="article article-style-b">
+          <div class="article-header">
+            <div class="article-image" data-background="{{ i.media.media_content }}">
+            </div>
+            <div class="article-badge">
+                <div class="article-badge-item bg-primary">{{i.product.product_name}}</div>
+            </div>
+          </div>
+          <div class="article-details">
+              <p class="badge badge-primary">{{ i.product.subcategories_id.title }}</p>
+              <h4>{{ i.title }}</h4>
+            <p class="product-description">{{ i.product.product_description }}</p>
+            <p>URL Slug: {{ i.product.url_slug }}</p>
+            <p>Product tags:
+            {% for j in i.tags %}
+            <p class="btn btn-primary" style="color:white;">{{j.title}}</p>
+            {% endfor %}
+            </p>
+            <div class="article-cta">
+                <label class="custom-switch mt-2" style="float:left;">
+                    <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input" {% if i.product.is_active %} checked {% endif %} disabled>
+                    <span class="custom-switch-indicator"></span>
+                    <span class="custom-switch-description">ACTIVE</span>
+                  </label>
+                <a href="{% url 'product_update_view' i.product.id %}" class="btn btn-primary">Add content<i class="fas fa-chevron-right"></i></a>
+            </div>
+          </div>
+        </article>
+      </div>
+    {% endfor %}
+</div>
+
+<div class="col-12">
+  <ul class="pagination">
+    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+      <a class="page-link" href="{% if page_obj.has_previous %}{% url 'product_list_view' %}?filter={{ filter }}&orderby={{ orderby }}&page={{ page_obj.previous_page_number }}{% endif %}" tabindex="-1">Previous</a>
+    </li>
+
+    {% for i in paginator.page_range %}
+    <li class="page-item {% if page_obj.number == i %}active{% endif %}"><a href="{% url 'product_list_view' %}?filter={{ filter }}&orderby={{ orderby }}&page={{ i }}" class="page-link">{{ i }}</a></li>
+    {% endfor %}
+    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+      <a class="page-link" href="{% if page_obj.has_next %}{% url 'product_list_view' %}?filter={{ filter }}&orderby={{ orderby }}&page={{ page_obj.next_page_number }}{% endif %}" tabindex="-1">Next</a>
+    </li>
+  </ul>
+</div>
+
+{% for i in sub_categories_sort_fields %}
+<h1>The field is: {{i}}</h1>
+{% endfor %}
+
+{% endblock page_content %}
+{% block custom_js %}
+{% endblock custom_js %}

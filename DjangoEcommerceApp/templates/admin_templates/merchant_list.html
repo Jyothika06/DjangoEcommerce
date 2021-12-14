@@ -1,0 +1,106 @@
+{% extends 'admin_templates/base_template.html' %}
+{% block title %}
+Merchant User List
+{% endblock title %}
+{% block custom_css %}
+
+{% endblock custom_css %}
+{% block page_title %}
+Merchant User List
+{% endblock page_title %}
+{% block page_content %}
+
+<form method="GET" class="form-inline mr-auto">
+  <div class=" col-12">
+    <div class="form-group" style="float: right;">
+      <label class="form-label">Sort by</label>
+      <div class="selectgroup w-100">
+        <label class="selectgroup-item">
+          <a href="{% url 'merchant_list_view' %}" style="text-decoration:none;">
+            <input type="radio" name="value" value="50" class="selectgroup-input" {% if orderby == "" %}checked{% endif %}>
+            <span class="selectgroup-button hover-shadow-5px">None</span>
+          </a>
+        </label>
+        <label class="selectgroup-item">
+          <a href="{% url 'merchant_list_view' %}?filter={{ filter }}&orderby=id" style="text-decoration:none;">
+            <input type="radio" name="value" value="50" class="selectgroup-input" {% if orderby == "id" %}checked{% endif %}>
+            <span class="selectgroup-button hover-shadow-5px">ID</span>
+          </a>
+        </label>
+        <label class="selectgroup-item">
+          <a href="{% url 'merchant_list_view' %}?filter={{ filter }}&orderby=company_name" style="text-decoration:none;">
+            <input type="radio" name="value" value="100" class="selectgroup-input" {% if orderby == "company_name" %}checked{% endif %}>
+            <span class="selectgroup-button hover-shadow-5px">Company Name</span>
+          </a>
+        </label>
+        <label class="selectgroup-item">
+          <a href="{% url 'merchant_list_view' %}?filter={{ filter }}&orderby=gst_details" style="text-decoration:none;">
+            <input type="radio" name="value" value="150" class="selectgroup-input" {% if orderby == "gst_details" %}checked{% endif %}>
+            <span class="selectgroup-button hover-shadow-5px">GST Details</span>
+          </a>
+        </label>
+        <label class="selectgroup-item">
+          <a href="{% url 'merchant_list_view' %}?filter={{ filter }}&orderby=created_at" style="text-decoration:none;">
+            <input type="radio" name="value" value="150" class="selectgroup-input" {% if orderby == "created_at" %}checked{% endif %}>
+            <span class="selectgroup-button hover-shadow-5px">Created At</span>
+          </a>
+        </label>
+      </div>
+    </div>
+    <div class="search-element">
+      <input class="form-control" type="search" placeholder="Search" aria-label="Search" data-width="250" style="width: 250px;" name="filter" value="{{filter}}">
+      <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>      
+    </div>
+  </div>
+</form>
+<br>
+
+<div class="row">
+    {% for i in merchantuser_list %}
+    <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+        <article class="article article-style-b">
+          <div class="article-header">
+            <div class="article-image" data-background="{{ i.profile_pic }}">
+            </div>
+            <div class="article-badge">
+                <div class="article-badge-item bg-primary">{{i.auth_user_id.username}}</div>
+            </div>
+          </div>
+          <div class="article-details">
+              <p class="badge badge-warning"><i class="fas fa-user-circle"></i> {{ i.auth_user_id.first_name }} {{ i.auth_user_id.last_name }}</p>
+              <p class="badge badge-primary"><i class="fas fa-envelope"></i> {{ i.auth_user_id.email }}</p>
+              <h5>Company name: {{i.company_name}}</h5>
+              <p>GST: {{i.gst_details}}</p>
+              <p>Address: {{i.address}}</p>
+              <p>Added By Admin: {% if i.is_added_by_admin %}Yes{% else %}No{% endif %}</p>
+            <div class="article-cta">
+                <label class="custom-switch mt-2" style="float:left;">
+                    <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input" {% if i.auth_user_id.is_active %} checked {% endif %} disabled>
+                    <span class="custom-switch-indicator"></span>
+                    <span class="custom-switch-description">ACTIVE</span>
+                  </label>
+              <a href="{% url 'merchant_update_view' i.auth_user_id.id %}" class="btn btn-primary">EDIT <i class="fas fa-chevron-right"></i></a>
+            </div>
+          </div>
+        </article>
+      </div>
+    {% endfor %}
+</div>
+
+<div class="col-12">
+  <ul class="pagination">
+    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+      <a class="page-link" href="{% if page_obj.has_previous %}{% url 'merchant_list_view' %}?filter={{ filter }}&orderby={{ orderby }}&page={{ page_obj.previous_page_number }}{% endif %}" tabindex="-1">Previous</a>
+    </li>
+    {% for i in paginator.page_range %}
+    <li class="page-item {% if page_obj.number == i %}active{% endif %}"><a href="{% url 'merchant_list_view' %}?filter={{ filter }}&orderby={{ orderby }}&page={{ i }}" class="page-link">{{ i }}</a></li>
+    {% endfor %}
+    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+      <a class="page-link" href="{% if page_obj.has_next %}{% url 'merchant_list_view' %}?filter={{ filter }}&orderby={{ orderby }}&page={{ page_obj.next_page_number }}{% endif %}" tabindex="-1">Next</a>
+    </li>
+  </ul>
+</div>
+
+{% endblock page_content %}
+{% block custom_js %}
+{% endblock custom_js %}
